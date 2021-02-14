@@ -1,8 +1,8 @@
 next-version: 1.0.0
-mode: ContinuousDelivery
+mode: Mineline
 branches:
   master:
-    mode: Mainline
+#    mode: ContinuousDelivery
     tag: ''
     increment: Patch
     prevent-increment-of-merged-branch-version: true
