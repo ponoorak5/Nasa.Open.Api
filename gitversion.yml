@@ -1,9 +1,71 @@
-mode: Mainline 
-next-version: 1.1.0 
+next-version: 1.0.0
+mode: ContinuousDelivery
 branches:
- feature:
-   tag: alpha
- master:
-   tag: '' 
+  master:
+    mode: ContinuousDelivery
+    tag: ''
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    regex: ^master
+    tracks-release-branches: false
+    is-release-branch: false
+  release:
+    mode: ContinuousDelivery
+    tag: beta
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    regex: ^releases?[/-]
+    tracks-release-branches: false
+    is-release-branch: true
+    pre-release-weight: 1000
+  feature:
+    mode: ContinuousDelivery
+    tag: useBranchName
+    increment: Inherit
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    regex: ^features?[/-]
+    tracks-release-branches: false
+    is-release-branch: false
+  pull-request:
+    mode: ContinuousDelivery
+    tag: PullRequest
+    increment: Inherit
+    prevent-increment-of-merged-branch-version: false
+    tag-number-pattern: '[/-](?<number>\d+)[-/]'
+    track-merge-target: false
+    regex: ^(pull|pull\-requests|pr)[/-]
+    tracks-release-branches: false
+    is-release-branch: false
+  hotfix:
+    mode: ContinuousDelivery
+    tag: beta
+    increment: Patch
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    regex: ^hotfix(es)?[/-]
+    tracks-release-branches: false
+    is-release-branch: false
+  support:
+    mode: ContinuousDelivery
+    tag: ''
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    regex: ^support[/-]
+    tracks-release-branches: false
+    is-release-branch: false
+  develop:
+    mode: ContinuousDeployment
+    tag: unstable
+    increment: Minor
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: true
+    regex: ^dev(elop)?(ment)?$
+    tracks-release-branches: true
+    is-release-branch: false
 ignore:
-   sha: []
+  sha: []
+merge-message-formats: {}
