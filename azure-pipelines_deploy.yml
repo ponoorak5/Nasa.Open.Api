@@ -2,8 +2,6 @@ trigger:
 - master
 - develop
 - release/*
-- feature/*
-- bugfix/*
 
 pool:
   vmImage: 'windows-latest'
@@ -12,22 +10,19 @@ variables:
   buildConfiguration: 'Release'
   solution: '**/*.sln'
   tests: '**/*Tests.csproj'
-
 steps:
-- task: GitVersion@5
-  displayName: 'GitVersion'
+- checkout: self
+  persistCredentials: true
+
+- task: gitversion/setup@0
+  displayName: 'Install GitTools'
   inputs:
-    updateAssemblyInfo: true
-    preferBundledVersion: false
-
-- script: echo %Action%%BuildVersion%
-  displayName: 'Set build version'
-  env:
-#    Action: '##vso[build.updatebuildnumber]'
-    BuildVersion: $(GitVersion.SemVer)
-
-- script: echo '$(GitVersion.NuGetVersion) $(GitVersion.SemVer) $(solution)'
-
+    versionSpec: '5.3.x'
+- task: gitversion/execute@0
+  displayName: 'Calculate SemVer'
+- script: echo current version is $(GitVersion.SemVer)
+  displayName: 'Display calculated version'
+  
 - task: UseDotNet@2
   displayName: 'Setup .NET SDK Version 3.x'
   inputs:
@@ -39,18 +34,6 @@ steps:
   inputs:
     command: 'restore'
     projects: '$(solution)'
-
-
-# - task: DotNetCoreCLI@2 
-#   displayName: 'Restore from feed' 
-#   inputs:
-#     command: 'restore'
-#     projects: '$(solution)'
-#     feedsToUse: 'select'
-#     vstsFeed: '3f77c195-d5b2-42b8-b020-9a39ada7715d/496c0bf7-cfee-43ff-8a84-f4292d77110e'
-#     noCache: true
-#     verbosityRestore: 'Normal'
-    
 
 - task: DotNetCoreCLI@2 
   displayName: 'Build Solution' 
@@ -84,7 +67,8 @@ steps:
  
 - task: DotNetCoreCLI@2 
   displayName: 'Push Nuget' 
-  inputs: 
-    command: push 
-    publishVstsFeed: '3f77c195-d5b2-42b8-b020-9a39ada7715d/496c0bf7-cfee-43ff-8a84-f4292d77110e' 
-    versioningScheme: byBuildNumber
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: '3f77c195-d5b2-42b8-b020-9a39ada7715d/49e70946-a183-4655-ae10-a30e8ab2f693'
