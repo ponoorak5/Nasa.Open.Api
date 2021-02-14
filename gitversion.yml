@@ -2,7 +2,7 @@ next-version: 1.0.0
 mode: ContinuousDelivery
 branches:
   master:
-    mode: ContinuousDelivery
+    mode: Mainline
     tag: ''
     increment: Patch
     prevent-increment-of-merged-branch-version: true
