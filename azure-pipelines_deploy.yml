@@ -1,0 +1,90 @@
+trigger:
+- master
+- develop
+- release/*
+- feature/*
+- bugfix/*
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  solution: '**/*.sln'
+  tests: '**/*Tests.csproj'
+
+steps:
+- task: GitVersion@5
+  displayName: 'GitVersion'
+  inputs:
+    updateAssemblyInfo: true
+    preferBundledVersion: false
+
+- script: echo %Action%%BuildVersion%
+  displayName: 'Set build version'
+  env:
+#    Action: '##vso[build.updatebuildnumber]'
+    BuildVersion: $(GitVersion.SemVer)
+
+- script: echo '$(GitVersion.NuGetVersion) $(GitVersion.SemVer) $(solution)'
+
+- task: UseDotNet@2
+  displayName: 'Setup .NET SDK Version 3.x'
+  inputs:
+    packageType: 'sdk'
+    version: '3.x'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
+  inputs:
+    command: 'restore'
+    projects: '$(solution)'
+
+
+# - task: DotNetCoreCLI@2 
+#   displayName: 'Restore from feed' 
+#   inputs:
+#     command: 'restore'
+#     projects: '$(solution)'
+#     feedsToUse: 'select'
+#     vstsFeed: '3f77c195-d5b2-42b8-b020-9a39ada7715d/496c0bf7-cfee-43ff-8a84-f4292d77110e'
+#     noCache: true
+#     verbosityRestore: 'Normal'
+    
+
+- task: DotNetCoreCLI@2 
+  displayName: 'Build Solution' 
+  inputs: 
+    projects: '$(solution)' 
+    arguments: '--configuration $(BuildConfiguration) /p:Version=$(GitVersion.SemVer)' 
+    versioningScheme: byBuildNumber
+
+- task: DotNetCoreCLI@2
+  displayName: 'Running Tests'
+  inputs:
+    command: 'test'
+    projects: '$(tests)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack' 
+  inputs: 
+    command: pack
+    packagesToPack: '$(solution)' 
+    nobuild: true 
+    versioningScheme: byEnvVar 
+    verbosityPack: 'Normal'
+    versionEnvVar: GitVersion.SemVer
+ 
+- task: DotNetCoreCLI@2 
+  displayName: 'Push Nuget' 
+  inputs: 
+    command: push 
+    publishVstsFeed: '3f77c195-d5b2-42b8-b020-9a39ada7715d/496c0bf7-cfee-43ff-8a84-f4292d77110e' 
+    versioningScheme: byBuildNumber

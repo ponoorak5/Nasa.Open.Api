@@ -1,0 +1,60 @@
+trigger:
+ - feature/*
+
+pr:
+ - release/*
+ - develop
+ - master
+
+pool:
+  vmImage: 'windows-latest'
+
+parameters:
+- name: projects
+  default: '**/*.csproj'
+  values:
+    - '**/*.csproj'
+
+variables:
+  buildConfiguration: 'Release'
+  solution: '**/*.sln'
+  tests: '**/*Tests.csproj'
+  GitVersion.SemVer: ''
+
+steps:
+- task: GitVersion@5
+  displayName: Install GitVersion
+  inputs:
+    runtime: 'core'
+    updateAssemblyInfo: true
+
+- script: echo '$(GitVersion.NuGetVersion) $(GitVersion.SemVer)_ $(solution)'
+
+- task: UseDotNet@2
+  displayName: 'Setup .NET SDK Version 3.x'
+  inputs:
+    packageType: 'sdk'
+    version: '3.x'
+
+- task: DotNetCoreCLI@2 
+  displayName: 'Restore from feed' 
+  inputs:
+    command: 'restore'
+    projects: '$(solution)'
+    feedsToUse: 'select'
+    vstsFeed: '3f77c195-d5b2-42b8-b020-9a39ada7715d/496c0bf7-cfee-43ff-8a84-f4292d77110e'
+    noCache: true
+    verbosityRestore: 'Normal'
+
+- task: DotNetCoreCLI@2 
+  displayName: 'Build Solution' 
+  inputs: 
+    projects: '$(solution)' 
+    arguments: '--configuration $(BuildConfiguration) /p:Version=$(GitVersion.NuGetVersion)' 
+    versioningScheme: byBuildNumber
+
+- task: DotNetCoreCLI@2
+  displayName: 'Running Tests'
+  inputs:
+    command: 'test'
+    projects: '$(tests)'
