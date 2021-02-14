@@ -22,13 +22,17 @@ variables:
   GitVersion.SemVer: ''
 
 steps:
-- task: GitVersion@5
-  displayName: Install GitVersion
-  inputs:
-    runtime: 'core'
-    updateAssemblyInfo: true
+- checkout: self
+  persistCredentials: true
 
-- script: echo '$(GitVersion.NuGetVersion) $(GitVersion.SemVer)_ $(solution)'
+- task: gitversion/setup@0
+  displayName: 'Install GitTools'
+  inputs:
+    versionSpec: '5.3.x'
+- task: gitversion/execute@0
+  displayName: 'Calculate SemVer'
+- script: echo current version is $(GitVersion.SemVer)
+  displayName: 'Display calculated version'
 
 - task: UseDotNet@2
   displayName: 'Setup .NET SDK Version 3.x'
