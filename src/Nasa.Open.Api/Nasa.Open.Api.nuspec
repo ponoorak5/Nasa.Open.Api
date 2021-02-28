@@ -8,7 +8,7 @@
     <owners>$author$</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
-    <projectUrl>https://github.com/ponoorak/Nasa.Open.Api</projectUrl>
+    <projectUrl>https://ponoorak.visualstudio.com/Optra2.0/_git/Nasa.Open.Api</projectUrl>
       <description>$description$</description>
     <releaseNotes>Earth Connect</releaseNotes>
     <copyright>Copyright 2020</copyright>
