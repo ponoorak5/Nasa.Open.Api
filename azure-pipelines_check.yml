@@ -1,10 +1,7 @@
 trigger:
- - feature/*
-
-pr:
- - release/*
- - develop
- - master
+  branches:
+    exclude:
+    - '*'
 
 pool:
   vmImage: 'windows-latest'
