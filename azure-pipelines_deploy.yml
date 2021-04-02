@@ -34,6 +34,8 @@ steps:
   inputs:
     command: 'restore'
     projects: '$(solution)'
+    feedsToUse: 'select'
+    vstsFeed: '3f77c195-d5b2-42b8-b020-9a39ada7715d/49e70946-a183-4655-ae10-a30e8ab2f693'
 
 - task: DotNetCoreCLI@2 
   displayName: 'Build Solution' 

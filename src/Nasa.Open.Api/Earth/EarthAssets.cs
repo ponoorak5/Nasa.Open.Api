@@ -7,7 +7,7 @@
     using Models;
 
     [EndPoint(Consts.BASE_URL1, "planetary/earth/assets")]
-    internal class EarthAssets : Connection, IEarthAssets
+    public class EarthAssets : Connection, IEarthAssets
     {
         public async Task<EarthAssetsData> GetAsync(double latitude, double longitude, DateTime? date = null, double sizeInDegrees = 0.25)
         { 

@@ -58,7 +58,12 @@
             return tle;
         }
 
-        public static TwoLineElementsModel Parse(List<string> lines)
+        public static TwoLineElementsModel Parse(IReadOnlyCollection<string> lines)
+        {
+            return Parse(new Queue<string>(lines));
+        }
+
+        public static TwoLineElementsModel Parse(params string [] lines)
         {
             return Parse(new Queue<string>(lines));
         }

@@ -7,7 +7,7 @@
     using Models;
 
     [EndPoint(Consts.BASE_URL1, "neo/rest/v1/feed")]
-    internal class NeoFeed : Connection, INeoFeed
+    public class NeoFeed : Connection, INeoFeed
     {
         public NeoFeed(string apiKey, NasaOpenApiState state) : base(apiKey, state)
         {
