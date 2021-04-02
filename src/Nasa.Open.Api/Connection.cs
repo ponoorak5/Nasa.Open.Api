@@ -1,4 +1,7 @@
-﻿namespace Nasa.Open.Api
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+
+namespace Nasa.Open.Api
 {
     using System;
     using System.Collections.Generic;
@@ -8,12 +11,11 @@
     using System.Threading.Tasks;
     using System.Web;
     using Attributes;
-    using Newtonsoft.Json;
-    using NLog;
 
-    internal class Connection
+
+    public class Connection
     {
-        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger _logger = ApplicationLogging.CreateLogger<Connection>();
         private readonly string _apiKey;
         private readonly NasaOpenApiState _state;
         private static readonly HttpClient Client = new HttpClient();
@@ -26,7 +28,7 @@
 
         public async Task<HttpContent> Request(IReadOnlyDictionary<string, object> arguments = null, string suffix = "")
         {
-            _logger.Trace("Request");
+            _logger.LogTrace("Request");
 
             var att = GetType().GetCustomAttribute<EndPointAttribute>();
             if (att == null)
@@ -55,25 +57,25 @@
 
             builder.Query = query.ToString();
 
-            _logger.Debug($"Call To {builder.Uri} {builder.Path}");
+            _logger.LogDebug($"Call To {builder.Uri} {builder.Path}");
             var s = await Client.GetAsync(builder.Uri);
 
-            _logger.Trace($"Return code: {s.StatusCode}");
+            _logger.LogTrace($"Return code: {s.StatusCode}");
             s.EnsureSuccessStatusCode();
 
             if (s.Headers.TryGetValues("X-RateLimit-Remaining", out var val))
             {
-                _logger.Debug($"X-RateLimit-Remaining exists. Value {val}");
+                _logger.LogDebug($"X-RateLimit-Remaining exists. Value {val}");
                 _state.Remaining = Convert.ToInt32(val.FirstOrDefault());
             }
 
             if (s.Headers.TryGetValues("X-RateLimit-Limit", out val))
             {
-                _logger.Debug($"X-RateLimit-Limit exists. Value {val}");
+                _logger.LogDebug($"X-RateLimit-Limit exists. Value {val}");
                 _state.Limit = Convert.ToInt32(val.FirstOrDefault());
             }
             
-            _logger.Debug($"Result Status Remaining:{_state.Remaining} Limit{_state.Limit}");
+            _logger.LogDebug($"Result Status Remaining:{_state.Remaining} Limit{_state.Limit}");
 
             return s.Content;
 

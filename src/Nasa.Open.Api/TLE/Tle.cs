@@ -45,7 +45,7 @@
 
 
     [EndPoint(Consts.BASE_TLE, "api/tle")]
-    internal class Tle : Connection, ITle
+    public class Tle : Connection, ITle
     {
         public async Task<TleResult> GetAsync(string query = "*")
         {

@@ -10,7 +10,7 @@
     }
 
     [EndPoint(Consts.BASE_URL1, "neo/rest/v1/stats")]
-    internal class NeoStats : Connection, INeoStats
+    public class NeoStats : Connection, INeoStats
     {
         public NeoStats(string apiKey, NasaOpenApiState state) : base(apiKey, state)
         {

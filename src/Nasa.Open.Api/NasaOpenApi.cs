@@ -9,26 +9,109 @@
     using Mars.Weather;
     using TLE;
 
-    internal class NasaOpenApiState
+    public class NasaOpenApiState
     {
         public int Remaining { get; internal set; }
         public int Limit { get; internal set; }
     }
 
-    public class NasaOpenApi
+    public interface INasaOpenApi
     {
         /// <summary>
         /// Get Remaining calls available (depend from api key)
         /// </summary>
-        public int Remaining => _nasaOpenApiState.Remaining;
+        int Remaining { get; }
 
         /// <summary>
         /// Get Limit calls tu use (depend from api key)
         /// http://api.nasa.gov
         /// </summary>
-        public int Limit => _nasaOpenApiState.Limit;
+        int Limit { get; }
 
-        private readonly NasaOpenApiState _nasaOpenApiState = new NasaOpenApiState();
+        /// <summary>
+        /// Interface for APOD https://apod.nasa.gov/apod/astropix.html
+        /// </summary>
+        /// <see cref="IApod"/>
+        IApod Apod { get; }
+
+        /// <summary>
+        /// Retrieve a list of Asteroids based on their closest approach date to Earth
+        /// </summary>
+        /// <see cref="INeoFeed"/>
+        INeoFeed NeoFeed { get; }
+
+        /// <summary>
+        /// Lookup a specific Asteroid based on its NASA JPL small body (SPK-ID) 
+        /// </summary>
+        /// <see cref="INeoLookup"/>
+        INeoLookup NeoLookup { get; }
+
+        /// <summary>
+        /// Near Earth Objects Today
+        /// </summary>
+        ///<see cref="INeoToday"/>
+        INeoToday NeoToday { get; }
+
+        /// <summary>
+        /// Nasa Earth Impact Monitoring
+        /// </summary>
+        /// <see cref="INeoSentry"/>
+        INeoSentry NeoSentry { get; }
+
+        /// <summary>
+        /// Browse the overall Asteroid data-set
+        /// </summary>
+        /// <see cref="INeoBrowse"/>
+        INeoBrowse NeoBrowse { get; }
+
+        INeoStats NeoStats { get; }
+
+        /// <summary>
+        /// This API is designed to collect image data gathered by NASA's Curiosity, Opportunity, and Spirit rovers on Mars
+        /// </summary>
+        /// <see cref="IMarsPhotos"/>
+        IMarsPhotos MarsPhotos { get; }
+
+        /// <summary>
+        /// This API provides per-Sol summary data for each of the last seven available Sols (UNSTABLE!)
+        /// </summary>
+        /// <see cref="MarsWeather"/>
+        IMarsWeather MarsWeather { get; }
+
+        /// <summary>
+        /// This endpoint retrieves the Landsat 8 image for the supplied location and date. 
+        /// </summary>
+        /// <see cref="IEarthImage"/>
+        IEarthImage EarthImage { get; }
+
+        /// <summary>
+        /// this endpoint retrieves the date-times and asset names for closest available imagery for a supplied location and date.
+        /// </summary>
+        IEarthAssets EarthAssets { get; }
+
+        /// <summary>
+        /// The TLE API provides up to date two line element set records, the data is updated daily from CelesTrak and served in JSON format
+        /// </summary>
+        ITle Tle { get; }
+    }
+
+    public class NasaOpenApi : INasaOpenApi
+    {
+        /// <summary>
+        /// Get Remaining calls available (depend from api key)
+        /// </summary>
+        public int Remaining => NasaOpenApiState.Remaining;
+
+        /// <summary>
+        /// Get Limit calls tu use (depend from api key)
+        /// http://api.nasa.gov
+        /// </summary>
+        public int Limit => NasaOpenApiState.Limit;
+
+        private static readonly Lazy<NasaOpenApiState> _nasaOpenApiState =
+            new Lazy<NasaOpenApiState>(() => new NasaOpenApiState());
+
+        public static NasaOpenApiState NasaOpenApiState => _nasaOpenApiState.Value;
         /// <summary>
         /// Initialize using api_key
         /// </summary>
@@ -41,18 +124,18 @@
                 throw new ArgumentException("Provided api_key is invalid, genere new key using https://api.nasa.gov/");
             }
 
-            Apod = new Apod(apiKey, _nasaOpenApiState);
-            NeoFeed = new NeoFeed(apiKey, _nasaOpenApiState);
-            NeoLookup = new NeoLookup(apiKey, _nasaOpenApiState);
-            NeoToday = new NeoToday(apiKey, _nasaOpenApiState);
-            NeoSentry = new NeoSentry(apiKey, _nasaOpenApiState);
-            NeoBrowse = new NeoBrowse(apiKey, _nasaOpenApiState);
-            NeoStats = new NeoStats(apiKey, _nasaOpenApiState);
-            MarsPhotos = new MarsPhotos(apiKey, _nasaOpenApiState);
-            EarthImage = new EarthImage(apiKey, _nasaOpenApiState);
-            EarthAssets = new EarthAssets(apiKey, _nasaOpenApiState);
-            //MarsWeather = new MarsWeather(apiKey, _nasaOpenApiState);
-            Tle = new Tle(_nasaOpenApiState);
+            Apod = new Apod(apiKey, NasaOpenApiState);
+            NeoFeed = new NeoFeed(apiKey, NasaOpenApiState);
+            NeoLookup = new NeoLookup(apiKey, NasaOpenApiState);
+            NeoToday = new NeoToday(apiKey, NasaOpenApiState);
+            NeoSentry = new NeoSentry(apiKey, NasaOpenApiState);
+            NeoBrowse = new NeoBrowse(apiKey, NasaOpenApiState);
+            NeoStats = new NeoStats(apiKey, NasaOpenApiState);
+            MarsPhotos = new MarsPhotos(apiKey, NasaOpenApiState);
+            EarthImage = new EarthImage(apiKey, NasaOpenApiState);
+            EarthAssets = new EarthAssets(apiKey, NasaOpenApiState);
+            MarsWeather = new MarsWeather(apiKey, NasaOpenApiState);
+            Tle = new Tle(NasaOpenApiState);
         }
 
         /// <summary>
@@ -107,11 +190,11 @@
         /// <see cref="IMarsPhotos"/>
         public IMarsPhotos MarsPhotos { get; }
 
-        ///// <summary>
-        ///// This API provides per-Sol summary data for each of the last seven available Sols
-        ///// </summary>
-        ///// <see cref="MarsWeather"/>
-        //public IMarsWeather MarsWeather { get; }
+        /// <summary>
+        /// This API provides per-Sol summary data for each of the last seven available Sols (UNSTABLE!)
+        /// </summary>
+        /// <see cref="MarsWeather"/>
+        public IMarsWeather MarsWeather { get; }
 
         /// <summary>
         /// This endpoint retrieves the Landsat 8 image for the supplied location and date. 
