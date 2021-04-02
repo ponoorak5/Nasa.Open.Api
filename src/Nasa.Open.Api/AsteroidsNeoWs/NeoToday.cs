@@ -5,7 +5,7 @@
     using Models;
 
     [EndPoint(Consts.BASE_URL1, "neo/rest/v1/feed/today")]
-    internal class NeoToday : Connection, INeoToday
+    public class NeoToday : Connection, INeoToday
     {
         public NeoToday(string apiKey, NasaOpenApiState state) : base(apiKey, state)
         {

@@ -2,10 +2,31 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+      <Authors>ponoorak</Authors>
+      <Description>https://ponoorak.visualstudio.com/Optra2.0/_git/Nasa.Open.Api</Description>
+      <Company>Optra</Company>
+      <PackageProjectUrl>https://ponoorak.visualstudio.com/Optra2.0/_git/Nasa.Open.Api</PackageProjectUrl>
+      <RepositoryUrl>https://ponoorak.visualstudio.com/Optra2.0/_git/Nasa.Open.Api</RepositoryUrl>
+      <Version>0.1.1</Version>
+      <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+      <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nasa.Open.Api\Nasa.Open.Api.csproj" />
+    <None Include="..\..\LICENSE" Link="LICENSE">
+      <PackagePath></PackagePath>
+      <Pack>True</Pack>
+    </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nasa.Open.Api\Nasa.Open.Api.csproj" />
+    <ProjectReference Include="..\Two.Line.Elements\Two.Line.Elements.csproj" />
+  </ItemGroup>
+
 
 </Project>
